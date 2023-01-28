@@ -1,0 +1,46 @@
+.form {
+  /* font-family: 'Radix', sans-serif; */
+
+  .form-group {
+    margin-bottom: 1rem;
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      /* text-transform: uppercase; */
+      letter-spacing: 0.1em;
+    }
+
+    .form-control {
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+
+      &:focus {
+        border-color: #2196f3;
+        box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+      }
+    }
+  }
+
+  button.btn {
+    background-color: #6200ee;
+    color: #fff;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    &:hover {
+      background-color: #5c00e6;
+    }
+    &:active {
+      background-color: #4d00c5;
+    }
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #6200ee;
+    }
+  }
+}
+
