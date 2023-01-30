@@ -53,7 +53,6 @@ const Form = ({ onFormSubmit, queryOptionsSize, queryOptionsProvince, queryOptio
     const { uuid, tgl_parsed, timestamp, ...rest } = formData
 
     return Object.keys(rest).some((key) => {
-      // @ts-ignore
       if (formData[key] === '') {
         return true
       }

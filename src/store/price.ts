@@ -43,10 +43,11 @@ const initialState: PriceFormData = {
 
 export const usePriceStore = create<State & Actions>((set) => ({
   formData: initialState,
-  setFormData: (data: PriceFormData) => set((state) => {
-    const [tgl_parsed, timestamp] = generateTglParsedTimestamp()
-    return { formData: { ...state.formData, ...data, tgl_parsed, timestamp } }
-  }),
+  setFormData: (data: PriceFormData) =>
+    set((state) => {
+      const [tgl_parsed, timestamp] = generateTglParsedTimestamp()
+      return { formData: { ...state.formData, ...data, tgl_parsed, timestamp } }
+    }),
   resetFormData: () => set(() => ({ formData: initialState })),
   isLoadingSubmit: false,
   setIsLoadingSubmit: (isLoading: boolean) => set(() => ({ isLoadingSubmit: isLoading })),
