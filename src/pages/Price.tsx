@@ -88,6 +88,8 @@ const Price = () => {
 
   const addPriceMutation = useMutation({
     mutationFn: async (price: PricePayload[]) => {
+      price[0].komoditas = price[0].komoditas.toUpperCase()
+      console.log(price)
       return await axios.post('https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/list', price)
     },
     onSettled: () => {
@@ -119,6 +121,7 @@ const Price = () => {
 
   const updatePriceMutation = useMutation({
     mutationFn: async (payload: PricePayload) => {
+      payload.komoditas = payload.komoditas.toUpperCase()
       const data = {
         condition: { uuid: payload.uuid },
         set: payload,
@@ -284,7 +287,7 @@ const Price = () => {
     setSearchKey('')
   }, [])
 
-  if (queryPriceList.isLoading) return <div>Loading...</div>
+  if (queryPriceList.isLoading) return <h2 style={{ textAlign: 'center' }}>Loading...</h2>
 
   return (
     <>
@@ -297,8 +300,6 @@ const Price = () => {
           <SearchInput onChange={handleSearchInputChanges} onClear={handleClearSearchInput} value={searchKey} />
         </div>
       </div>
-
-      {/* <SearchInput /> */}
 
       <Table headers={headers} data={queryPriceList.data} onUpdate={handleUpdate} onDelete={handleDelete} />
 

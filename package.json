@@ -14,15 +14,12 @@
     "format": "pnpm run prettier:fix && pnpm run lint:fix"
   },
   "dependencies": {
-    "@fontsource/inter": "^4.5.15",
-    "@popperjs/core": "^2.11.6",
     "@tanstack/react-query": "^4.23.0",
     "@tanstack/react-query-devtools": "^4.23.0",
     "axios": "^1.2.5",
     "framer-motion": "^8.5.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-popper": "^2.3.0",
     "uuid": "^9.0.0",
     "zustand": "^4.3.2"
   },
@@ -33,7 +30,6 @@
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
     "@vitejs/plugin-react-swc": "^3.0.0",
-    "add": "^2.0.6",
     "eslint": "^8.32.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-import": "^2.27.5",

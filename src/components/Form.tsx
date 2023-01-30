@@ -55,7 +55,10 @@ const Form = ({ onFormSubmit, queryOptionsSize, queryOptionsProvince, queryOptio
   }
 
   const checkInput = () => {
-    return Object.keys(formData).some((key) => {
+    const { uuid, tgl_parsed, timestamp, ...rest } = formData
+
+    return Object.keys(rest).some((key) => {
+      // @ts-ignore
       if (formData[key] === '') {
         return true
       }
@@ -88,7 +91,7 @@ const Form = ({ onFormSubmit, queryOptionsSize, queryOptionsProvince, queryOptio
           name='price'
           className={cls.formControl}
           style={{ width: '95%' }}
-          type='text'
+          type='number'
           value={formData.price}
           onChange={handleChange}
         />
