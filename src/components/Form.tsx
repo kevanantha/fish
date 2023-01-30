@@ -50,10 +50,10 @@ const Form = ({ onFormSubmit, queryOptionsSize, queryOptionsProvince, queryOptio
   }
 
   const checkInput = () => {
-    const { uuid, tgl_parsed, timestamp, ...rest } = formData
+    const { uuid, tgl_parsed, timestamp, ...rest } = formData 
 
     return Object.keys(rest).some((key) => {
-      if (formData[key] === '') {
+      if (formData[key as keyof PriceState] === '') {
         return true
       }
       return false
