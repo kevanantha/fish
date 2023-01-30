@@ -2,3 +2,7 @@
 export const formatToISOString = (date: Date): string => date.toISOString().slice(0, -5) + 'Z'
 
 export const formatToTimestamp = (date: Date): string => date.getTime().toString()
+
+export const generateTglParsedTimestamp = (date: Date = new Date()): [string, string] => {
+  return [formatToISOString(date), formatToTimestamp(date)]
+}

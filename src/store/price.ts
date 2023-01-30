@@ -1,7 +1,4 @@
 import { create } from 'zustand'
-import { v4 as uuidv4 } from 'uuid'
-
-import { formatToISOString, formatToTimestamp } from '../utils/date'
 
 interface PriceFormData {
   uuid: string
@@ -14,37 +11,35 @@ interface PriceFormData {
   timestamp: string
 }
 
-interface PriceState {
+interface State {
   formData: PriceFormData
+  isLoadingSubmit: boolean
+  isEdit: boolean,
+  isLoadingUpdate: boolean
+  deleteId: string
+}
+
+interface Actions {
   setFormData: (data: PriceFormData) => void
   resetFormData: () => void
-  isLoadingSubmit: boolean
   setIsLoadingSubmit: (isLoading: boolean) => void
-  isEdit: boolean,
   setIsEdit: (isEdit: boolean) => void
-  isLoadingUpdate: boolean
   setIsLoadingUpdate: (isLoading: boolean) => void
+  setDeleteId: (id: string) => void
 }
-
-const generateUUID = (): string => uuidv4()
-const generateTglParsedTimestamp = (): [string, string] => {
-  const date = new Date()
-  return [formatToISOString(date), formatToTimestamp(date)]
-}
-const [tgl_parsed, timestamp] = generateTglParsedTimestamp();
 
 const initialState: PriceFormData = {
-  uuid: generateUUID(),
+  uuid: '',
   komoditas: '',
   area_provinsi: '',
   area_kota: '',
   size: '',
   price: '',
-  tgl_parsed,
-  timestamp,
+  tgl_parsed: '',
+  timestamp: '',
 }
 
-export const usePriceStore = create<PriceState>((set) => ({
+export const usePriceStore = create<State & Actions>((set) => ({
   formData: initialState,
   setFormData: (data: PriceFormData) => set((state) => ({ formData: { ...state.formData, ...data } })),
   resetFormData: () => set(() => ({ formData: initialState })),
@@ -54,4 +49,6 @@ export const usePriceStore = create<PriceState>((set) => ({
   setIsEdit: (isEdit: boolean) => set(() => ({ isEdit })),
   isLoadingUpdate: false,
   setIsLoadingUpdate: (isLoading: boolean) => set(() => ({ isLoadingUpdate: isLoading })),
+  deleteId: '',
+  setDeleteId: (id: string) => set(() => ({ deleteId: id })),
 }))

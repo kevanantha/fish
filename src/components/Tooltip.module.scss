@@ -1,0 +1,29 @@
+.tooltip {
+  position: absolute;
+  z-index: 9999;
+  background-color: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.tooltip-arrow {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  position: absolute;
+  margin: 5px;
+}
+
+.tooltip[data-placement='top'] .tooltip-arrow {
+  border-width: 5px 5px 0 5px;
+  border-color: #333 transparent transparent transparent;
+  bottom: -5px;
+  left: calc(50% - 5px);
+}
+
+.tooltip-inner {
+  max-width: 200px;
+  text-align: center;
+}

@@ -1,7 +1,10 @@
-// import { v4 as uuidv4 } from 'uuid'
-import React, { useState } from 'react'
-import './Form.scss'
-// import { formatToISOString, formatToTimestamp } from '../utils/date'
+import React from 'react'
+import { UseQueryResult } from '@tanstack/react-query'
+
+import Button from './Button'
+
+import cls from './Form.module.scss'
+import { generateTglParsedTimestamp, generateUUID } from '../utils'
 import { usePriceStore } from '../store/price'
 
 interface PriceState {
@@ -16,130 +19,188 @@ interface PriceState {
 }
 
 interface FormProps {
-  options: string[]
   onFormSubmit: (payload: PriceState) => void
+  onCancel: () => void
+  queryOptionsSize: UseQueryResult<Array<{ size: string }>, unknown>
+  queryOptionsProvince: UseQueryResult<
+    Array<{ province: string; city: string }>,
+    unknown
+  >
+  queryOptionsCity: UseQueryResult<
+    Array<{ province: string; city: string }>,
+    unknown
+  >
 }
 
-// const generateUUID = (): string => uuidv4()
-// const generateTglParsedTimestamp = (): [string, string] => {
-//   const date = new Date()
-//   return [formatToISOString(date), formatToTimestamp(date)]
-// }
-// const[tgl_parsed, timestamp] = generateTglParsedTimestamp();
+const Form = ({
+  onFormSubmit,
+  queryOptionsSize,
+  queryOptionsProvince,
+  queryOptionsCity,
+  onCancel,
+}: FormProps) => {
+  const {
+    formData,
+    setFormData,
+    isLoadingSubmit,
+    setIsLoadingSubmit,
+    isEdit,
+    isLoadingUpdate,
+    setIsLoadingUpdate,
+  } = usePriceStore()
 
-const Form = ({ options, onFormSubmit }: FormProps) => {
-  // const [formData, setFormData] = useState<PriceState>({ uuid: generateUUID(), komoditas: '', area_kota: '', area_provinsi: '', size: '', price: '', tgl_parsed, timestamp })
-  const { formData, setFormData, isLoadingSubmit, setIsLoadingSubmit, isEdit, isLoadingUpdate, setIsLoadingUpdate } = usePriceStore()
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
   }
 
+  const handleChangeProvince = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target
+
+    setFormData({ ...formData, area_provinsi: value, area_kota: '' })
+    queryOptionsCity.refetch()
+  }
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
     isEdit ? setIsLoadingUpdate(true) : setIsLoadingSubmit(true)
-    // const [tgl_parsed, timestamp] = generateTglParsedTimestamp()
-    // setFormData({ ...formData, uuid: generateUUID(), tgl_parsed, timestamp })
+
+    const [tgl_parsed, timestamp] = generateTglParsedTimestamp()
+    const uuid = generateUUID()
+
+    setFormData({ ...formData, uuid, tgl_parsed, timestamp })
     onFormSubmit(formData)
   }
 
+  const checkInput = () => {
+    return Object.keys(formData).some((key) => {
+      if (formData[key] === '') {
+        return true
+      }
+      return false
+    })
+  }
+  const isDisabled = checkInput()
+
   return (
-    <form className="form" onSubmit={handleSubmit}>
-      <div className="form-group">
-        <label htmlFor="komoditas-field">Komoditas</label>
-        <input
-          id="komoditas-field"
-          name="komoditas"
-          className="form-control"
-          type="text"
-          value={formData.komoditas}
-          onChange={handleChange}
-        />
+    <form className={cls.form} onSubmit={handleSubmit}>
+      <div className={cls.formGroup}>
+        <label htmlFor='komoditas-field'>Komoditas</label>
+        <div role='group'>
+          <input
+            id='komoditas-field'
+            name='komoditas'
+            className={cls.formControl}
+            style={{ width: '95%' }}
+            type='text'
+            value={formData.komoditas}
+            onChange={handleChange}
+          />
+        </div>
       </div>
 
-      <div className="form-group">
-        <label htmlFor="price-field">Price</label>
+      <div className={cls.formGroup}>
+        <label htmlFor='price-field'>Price</label>
         <input
-          id="price-field"
-          name="price"
-          className="form-control"
-          type="text"
+          id='price-field'
+          name='price'
+          className={cls.formControl}
+          style={{ width: '95%' }}
+          type='text'
           value={formData.price}
           onChange={handleChange}
         />
       </div>
 
-      <div className="form-group">
-        <label htmlFor="size-field">Size</label>
-        <select
-          id="size-field"
-          name="size"
-          className="form-control"
-          value={formData.size}
-          onChange={handleChange}
-        >
-          <option value="" disabled>
-            Select an option
-          </option>
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="province-field">Province</label>
-        <select
-          id="province-field"
-          name="area_provinsi"
-          className="form-control"
-          value={formData.area_provinsi}
-          onChange={handleChange}
-        >
-          <option value="" disabled>
-            Select an option
-          </option>
-          {['BALI', 'DKI JAKARTA'].map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="area-field">Area</label>
-        <select
-          id="area-field"
-          name="area_kota"
-          className="form-control"
-          value={formData.area_kota}
-          onChange={handleChange}
-        >
-          <option value="" disabled>
-            Select an option
-          </option>
-          {['BULELENG', 'NUSA PENIDA'].map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {isEdit ? (
-        <button type="submit" disabled={!!isLoadingUpdate} className="btn">
-          {isLoadingUpdate ? 'Updating...' : 'Update'}
-        </button>
+      {queryOptionsSize.isLoading ? (
+        <div>Loading options size</div>
       ) : (
-        <button type="submit" disabled={!!isLoadingSubmit} className="btn">
-          {isLoadingSubmit ? 'Submitting...' : 'Submit'}
-        </button>
+        <div className={cls.formGroup}>
+          <label htmlFor='size-field'>Size</label>
+          <select
+            id='size-field'
+            name='size'
+            className={cls.formControl}
+            value={formData.size}
+            onChange={handleChange}
+          >
+            <option value='' disabled>
+              Select an option
+            </option>
+            {queryOptionsSize.data?.map(({ size }, index) => (
+              <option key={index} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </div>
       )}
-    </form >
+
+      <div className={cls.formGroup}>
+        <label htmlFor='province-field'>Province</label>
+        <select
+          id='province-field'
+          name='area_provinsi'
+          className={cls.formControl}
+          value={formData.area_provinsi}
+          onChange={handleChangeProvince}
+        >
+          <option value='' disabled>
+            Select an option
+          </option>
+          {queryOptionsProvince.data?.map(({ province }, index) => (
+            <option key={index} value={province}>
+              {province}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {queryOptionsCity.isPaused ? (
+        <div>fetching options city</div>
+      ) : (
+        <div className={cls.formGroup}>
+          <label htmlFor='area-field'>Area</label>
+          <select
+            id='area-field'
+            name='area_kota'
+            className={cls.formControl}
+            value={formData.area_kota}
+            disabled={!formData.area_provinsi || queryOptionsCity.isFetching}
+            onChange={handleChange}
+          >
+            <option value='' disabled={queryOptionsCity.isFetching}>
+              {queryOptionsCity.isFetching
+                ? 'Fetching options city...'
+                : 'Select an option'}
+            </option>
+            {queryOptionsCity.data?.map(({ city }, index) => (
+              <option key={index} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', justifyContent: 'end', gap: '8px' }}>
+        {isEdit ? (
+          <Button type='submit' isDisabled={!!isLoadingUpdate || isDisabled} variant='solid'>
+            {isLoadingUpdate ? 'Updating...' : 'Update'}
+          </Button>
+        ) : (
+          <Button type='submit' isDisabled={!!isLoadingSubmit || isDisabled} variant='solid'>
+            {isLoadingSubmit ? 'Submitting...' : 'Submit'}
+          </Button>
+        )}
+        <Button type='button' isDisabled={isLoadingSubmit || isLoadingUpdate} variant='outline' onClick={onCancel}>
+          Cancel
+        </Button>
+      </div>
+    </form>
   )
 }
 
