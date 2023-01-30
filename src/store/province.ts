@@ -12,5 +12,5 @@ interface Actions {
 
 export const useProvinceStore = create<State & Actions>((set) => ({
   provinces: [],
-  setProvinces: (provinces: TProvinces) => set(() => ({ provinces: provinces }))
+  setProvinces: (provinces: TProvinces) => set(() => ({ provinces: provinces })),
 }))

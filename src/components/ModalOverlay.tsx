@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion'
 import classes from './ModalOverlay.module.scss'
 
 interface ModalOverlayProps {
@@ -17,7 +17,7 @@ const ModalOverlay = ({ children, onClick }: ModalOverlayProps) => {
     >
       {children}
     </motion.div>
-  );
-};
+  )
+}
 
-export default ModalOverlay;
+export default ModalOverlay

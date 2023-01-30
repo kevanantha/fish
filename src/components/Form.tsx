@@ -22,36 +22,15 @@ interface FormProps {
   onFormSubmit: (payload: PriceState) => void
   onCancel: () => void
   queryOptionsSize: UseQueryResult<Array<{ size: string }>, unknown>
-  queryOptionsProvince: UseQueryResult<
-    Array<{ province: string; city: string }>,
-    unknown
-  >
-  queryOptionsCity: UseQueryResult<
-    Array<{ province: string; city: string }>,
-    unknown
-  >
+  queryOptionsProvince: UseQueryResult<Array<{ province: string; city: string }>, unknown>
+  queryOptionsCity: UseQueryResult<Array<{ province: string; city: string }>, unknown>
 }
 
-const Form = ({
-  onFormSubmit,
-  queryOptionsSize,
-  queryOptionsProvince,
-  queryOptionsCity,
-  onCancel,
-}: FormProps) => {
-  const {
-    formData,
-    setFormData,
-    isLoadingSubmit,
-    setIsLoadingSubmit,
-    isEdit,
-    isLoadingUpdate,
-    setIsLoadingUpdate,
-  } = usePriceStore()
+const Form = ({ onFormSubmit, queryOptionsSize, queryOptionsProvince, queryOptionsCity, onCancel }: FormProps) => {
+  const { formData, setFormData, isLoadingSubmit, setIsLoadingSubmit, isEdit, isLoadingUpdate, setIsLoadingUpdate } =
+    usePriceStore()
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
   }
@@ -120,13 +99,7 @@ const Form = ({
       ) : (
         <div className={cls.formGroup}>
           <label htmlFor='size-field'>Size</label>
-          <select
-            id='size-field'
-            name='size'
-            className={cls.formControl}
-            value={formData.size}
-            onChange={handleChange}
-          >
+          <select id='size-field' name='size' className={cls.formControl} value={formData.size} onChange={handleChange}>
             <option value='' disabled>
               Select an option
             </option>
@@ -173,9 +146,7 @@ const Form = ({
             onChange={handleChange}
           >
             <option value='' disabled={queryOptionsCity.isFetching}>
-              {queryOptionsCity.isFetching
-                ? 'Fetching options city...'
-                : 'Select an option'}
+              {queryOptionsCity.isFetching ? 'Fetching options city...' : 'Select an option'}
             </option>
             {queryOptionsCity.data?.map(({ city }, index) => (
               <option key={index} value={city}>
@@ -205,4 +176,3 @@ const Form = ({
 }
 
 export default Form
-

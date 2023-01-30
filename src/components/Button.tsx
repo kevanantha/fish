@@ -6,7 +6,7 @@ interface ButtonProps {
   variant?: 'solid' | 'outline'
   type?: 'button' | 'submit' | 'reset'
   isDisabled?: boolean
-  onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   style?: React.CSSProperties
 }
 
@@ -22,7 +22,6 @@ const Button = ({ children, type = 'button', variant = 'solid', isDisabled = fal
       {children}
     </button>
   )
-
 }
 
 export default Button

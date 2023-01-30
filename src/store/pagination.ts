@@ -18,5 +18,5 @@ export const usePaginationStore = create<State & Actions>((set) => ({
   prevPage: () => set((state) => ({ page: state.page - 1 })),
   nextPage: () => set((state) => ({ page: state.page + 1 })),
   totalPage: 1,
-  setTotalPage: (totalPage: number) => set(() => ({ totalPage }))
+  setTotalPage: (totalPage: number) => set(() => ({ totalPage })),
 }))

@@ -8,9 +8,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "pnpm dlx eslint src",
-    "lint:fix": "pnpm run lint -- --fix",
+    "lint:fix": "pnpm run lint --fix",
     "prettier": "pnpm dlx prettier src --check",
-    "prettier:fix": "pnpm run prettier -- --write",
+    "prettier:fix": "pnpm run prettier --write",
     "format": "pnpm run prettier:fix && pnpm run lint:fix"
   },
   "dependencies": {

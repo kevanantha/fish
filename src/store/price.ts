@@ -14,7 +14,7 @@ interface PriceFormData {
 interface State {
   formData: PriceFormData
   isLoadingSubmit: boolean
-  isEdit: boolean,
+  isEdit: boolean
   isLoadingUpdate: boolean
   deleteId: string
 }

@@ -3,14 +3,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 
 import { usePriceStore } from '../store/price'
-import { useProvinceStore } from '../store/province'
 import { usePaginationStore } from '../store/pagination'
+
+import { useDebounce } from '../hooks/useDebounce'
 
 import Button from '../components/Button'
 import Form from '../components/Form'
 import Table from '../components/Table'
 import SearchInput from '../components/SearchInput'
-import Pagination from '../components/Pagination'
 import Modal from '../components/Modal'
 
 type OptionsArea = Array<{ province: string; city: string }>
@@ -39,6 +39,8 @@ interface PricePayload {
 
 const Price = () => {
   const queryClient = useQueryClient()
+  const [searchKey, setSearchKey] = React.useState('')
+  const debouncedSearchKey = useDebounce<string>(searchKey, 1000)
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [isModalDeleteOpen, setIsModalDeleteOpen] = React.useState(false)
   const {
@@ -48,12 +50,10 @@ const Price = () => {
     setIsLoadingSubmit,
     isEdit,
     setIsEdit,
-    isLoadingUpdate,
     setIsLoadingUpdate,
     deleteId,
     setDeleteId,
   } = usePriceStore()
-  const { setProvinces } = useProvinceStore()
   const { page, setTotalPage } = usePaginationStore()
   const headers = [
     {
@@ -88,10 +88,7 @@ const Price = () => {
 
   const addPriceMutation = useMutation({
     mutationFn: async (price: PricePayload[]) => {
-      return await axios.post(
-        'https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/list',
-        price,
-      )
+      return await axios.post('https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/list', price)
     },
     onSettled: () => {
       resetFormData()
@@ -109,18 +106,13 @@ const Price = () => {
         limit: 1,
       }
 
-      return await axios.delete(
-        'https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/list',
-        { data },
-      )
+      return await axios.delete('https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/list', { data })
     },
     onSettled: () => {
       resetFormData()
       setIsLoadingSubmit(false)
-      console.log('on settled')
     },
     onSuccess: () => {
-      console.log('delete success')
       queryClient.invalidateQueries({ queryKey: ['price-list'] })
     },
   })
@@ -133,37 +125,35 @@ const Price = () => {
         limit: 1,
       }
 
-      return await axios.put(
-        'https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/list',
-        { ...data },
-      )
+      return await axios.put('https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/list', { ...data })
     },
     onSettled: () => {
-      // resetFormData()
-      // setIsLoadingSubmit(false)
       setIsEdit(false)
       setIsLoadingUpdate(false)
       resetFormData()
-      console.log('on settled')
     },
     onSuccess: () => {
-      console.log('update success')
       queryClient.invalidateQueries({ queryKey: ['price-list'] })
     },
   })
 
   // queries
   const queryPriceList = useQuery({
-    queryKey: ['price-list'],
+    queryKey: ['price-list', debouncedSearchKey],
     queryFn: async (): Promise<PriceList[]> => {
       /** NOTE(kevan): basically, it's for pagination but since the API is messy (a lot of null value and cannot delete it with 'condition uuid: null')
        * so I just paginate in client side
        */
       // const { data } = await axios.get('https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/list', { params: { limit: 10, offset: page } })
 
-      const { data } = await axios.get(
-        'https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/list',
-      )
+      const params: { search?: string } = {}
+      if (debouncedSearchKey) {
+        params.search = `{"komoditas": "${debouncedSearchKey.toUpperCase()}"}`
+      }
+
+      const { data } = await axios.get('https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/list', {
+        params,
+      })
       return data
     },
     select: (data: PriceList[]) => {
@@ -171,8 +161,6 @@ const Price = () => {
       const firstIndex = page === 1 ? 0 : page * 10
       const lastIndex = firstIndex + 10
       const filteredNull = data.filter((d: PriceList) => d.uuid !== null)
-
-      // setTotalPage(Math.floor(filteredNull.length / 10))
 
       return filteredNull
         .sort((a: PriceList, b: PriceList) => {
@@ -191,25 +179,21 @@ const Price = () => {
   const queryOptionsProvince = useQuery({
     queryKey: ['provinces'],
     queryFn: async (): Promise<OptionsArea> => {
-      const { data } = await axios.get(
-        'https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/option_area',
-      )
+      const { data } = await axios.get('https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/option_area')
       return data
     },
     select: (data: OptionsArea) => {
       // NOTE(kevan): to filter province and city that is empty
       const seen = new Set<string>()
-      const result = data.filter(
-        ({ province, city }: { province: string; city: string }) => {
-          if (!!province && !!city) {
-            if (seen.has(province)) return false
+      const result = data.filter(({ province, city }: { province: string; city: string }) => {
+        if (!!province && !!city) {
+          if (seen.has(province)) return false
 
-            seen.add(province)
-            return true
-          }
-          return false
-        },
-      )
+          seen.add(province)
+          return true
+        }
+        return false
+      })
       return result
     },
   })
@@ -218,26 +202,23 @@ const Price = () => {
     queryKey: ['cities', formData.area_provinsi],
     queryFn: async ({ queryKey }): Promise<OptionsArea> => {
       const [, area_provinsi] = queryKey
-      const { data } = await axios.get(
-        'https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/option_area',
-        { params: { search: `{"province": "${area_provinsi}"}` } },
-      )
+      const { data } = await axios.get('https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/option_area', {
+        params: { search: `{"province": "${area_provinsi}"}` },
+      })
       return data
     },
     select: (data: OptionsArea) => {
       // NOTE(kevan): to filter province and city that is empty
       const seen = new Set<string>()
-      const result = data.filter(
-        ({ province, city }: { province: string; city: string }) => {
-          if (!!province && !!city) {
-            if (seen.has(province)) return false
+      const result = data.filter(({ province, city }: { province: string; city: string }) => {
+        if (!!province && !!city) {
+          if (seen.has(province)) return false
 
-            seen.add(province)
-            return true
-          }
-          return false
-        },
-      )
+          seen.add(province)
+          return true
+        }
+        return false
+      })
       return result
     },
     enabled: !!formData.area_provinsi,
@@ -247,9 +228,7 @@ const Price = () => {
   const queryOptionsSize = useQuery({
     queryKey: ['sizes'],
     queryFn: async (): Promise<Array<{ size: string }>> => {
-      const { data } = await axios.get(
-        'https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/option_size',
-      )
+      const { data } = await axios.get('https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/option_size')
       return data
     },
     select: (data: Array<{ size: string }>) => {
@@ -268,10 +247,8 @@ const Price = () => {
   })
 
   const handleDelete = (uuid: string) => () => {
-    console.log('handle delete', uuid)
     setDeleteId(uuid)
     setIsModalDeleteOpen(true)
-    // deletePriceMutation.mutate(uuid)
   }
 
   const handleDeleteConfirm = async () => {
@@ -280,7 +257,6 @@ const Price = () => {
   }
 
   const handleSubmit = async (payload: PricePayload) => {
-    console.log('handle add', payload)
     if (isEdit) {
       await updatePriceMutation.mutateAsync(payload)
       setIsEdit(false)
@@ -295,37 +271,38 @@ const Price = () => {
   }
 
   const handleUpdate = (price: PricePayload) => () => {
-    console.log('handle update', price)
-
     setIsEdit(true)
     setFormData(price)
     setIsModalOpen(true)
   }
 
+  const handleSearchInputChanges = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchKey(e.target.value)
+  }, [])
+
+  const handleClearSearchInput = React.useCallback((_e: React.MouseEvent<HTMLElement>) => {
+    setSearchKey('')
+  }, [])
+
   if (queryPriceList.isLoading) return <div>Loading...</div>
 
   return (
     <>
-      <Button onClick={() => setIsModalOpen(true)}>Open Modal</Button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '6px' }}>
+          <Button onClick={() => setIsModalOpen(true)}>Add Price</Button>
+        </div>
 
-      {/* <SearchInput /> */}
-      <div style={{ width: '200px' }}>
-        <Pagination page={page} />
+        <div style={{ width: '300px' }}>
+          <SearchInput onChange={handleSearchInputChanges} onClear={handleClearSearchInput} value={searchKey} />
+        </div>
       </div>
 
-      {/* @ts-ignore */}
-      <Table
-        headers={headers}
-        data={queryPriceList.data}
-        onUpdate={handleUpdate}
-        onDelete={handleDelete}
-      />
+      {/* <SearchInput /> */}
 
-      <Modal
-        isOpen={isModalOpen}
-        title={isEdit ? 'Edit data' : 'Add data'}
-        onClose={() => setIsModalOpen(false)}
-      >
+      <Table headers={headers} data={queryPriceList.data} onUpdate={handleUpdate} onDelete={handleDelete} />
+
+      <Modal isOpen={isModalOpen} title={isEdit ? 'Edit data' : 'Add data'} onClose={() => setIsModalOpen(false)}>
         <Form
           queryOptionsSize={queryOptionsSize}
           queryOptionsProvince={queryOptionsProvince}
@@ -339,11 +316,7 @@ const Price = () => {
         />
       </Modal>
 
-      <Modal
-        isOpen={isModalDeleteOpen}
-        title='Delete data?'
-        onClose={() => setIsModalDeleteOpen(false)}
-      >
+      <Modal isOpen={isModalDeleteOpen} title='Delete data?' onClose={() => setIsModalDeleteOpen(false)}>
         <div>
           <p>This price data will be deleted.</p>
 
@@ -357,11 +330,7 @@ const Price = () => {
               {deletePriceMutation.isLoading ? 'Deleting...' : 'Delete'}
             </Button>
 
-            <Button
-              type='button'
-              variant='outline'
-              onClick={() => setIsModalDeleteOpen(false)}
-            >
+            <Button type='button' variant='outline' onClick={() => setIsModalDeleteOpen(false)}>
               Cancel
             </Button>
           </div>
@@ -372,4 +341,3 @@ const Price = () => {
 }
 
 export default Price
-

@@ -30,7 +30,7 @@
   }
 
   &:active {
-    background: #005D5C;
+    background: #005d5c;
   }
 
   &:disabled {
@@ -39,7 +39,6 @@
     cursor: not-allowed;
   }
 }
-
 
 .btn-outline {
   display: inline-flex;
@@ -69,7 +68,7 @@
   border: 2px solid rgba(49, 151, 149);
 
   &:hover {
-    background: rgba(49, 151, 149, 0.12)
+    background: rgba(49, 151, 149, 0.12);
   }
 
   &:active {
