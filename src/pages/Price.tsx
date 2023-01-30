@@ -58,7 +58,7 @@ const Price = () => {
   const headers = [
     {
       key: 'komoditas',
-      label: 'Komoditas',
+      label: 'Commodity',
     },
     {
       key: 'size',
@@ -77,7 +77,7 @@ const Price = () => {
       label: 'City',
     },
     {
-      key: 'tgl_parsed',
+      key: 'timestamp',
       label: 'Created at',
     },
     {
@@ -324,7 +324,7 @@ const Price = () => {
             <Button
               type='submit'
               isDisabled={deletePriceMutation.isLoading}
-              variant='solid'
+              variant='solid-red'
               onClick={handleDeleteConfirm}
             >
               {deletePriceMutation.isLoading ? 'Deleting...' : 'Delete'}

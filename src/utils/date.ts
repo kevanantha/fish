@@ -6,3 +6,12 @@ export const formatToTimestamp = (date: Date): string => date.getTime().toString
 export const generateTglParsedTimestamp = (date: Date = new Date()): [string, string] => {
   return [formatToISOString(date), formatToTimestamp(date)]
 }
+
+export const formatLocaleDateString = (timestamp: number) => {
+  const date = new Date(timestamp)
+  return date.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}

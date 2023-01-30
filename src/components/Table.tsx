@@ -1,5 +1,5 @@
 import cls from './Table.module.scss'
-import { capitalizeEachWord } from '../utils'
+import { capitalizeEachWord, formatCurrency, formatLocaleDateString } from '../utils'
 import { usePaginationStore } from '../store/pagination'
 
 interface TableProps {
@@ -68,7 +68,13 @@ const Table = ({ headers, data, onUpdate, onDelete }: TableProps) => {
                         </div>
                       </>
                     ) : (
-                      <>{capitalizeEachWord(item[header.key])}</>
+                      <>
+                        {header.key === 'price'
+                          ? formatCurrency(+item[header.key])
+                          : header.key === 'timestamp'
+                          ? formatLocaleDateString(+item[header.key])
+                          : capitalizeEachWord(item[header.key])}
+                      </>
                     )}
                   </td>
                 ))}

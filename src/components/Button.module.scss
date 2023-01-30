@@ -40,6 +40,46 @@
   }
 }
 
+.btn-solid-red {
+  display: inline-flex;
+  appearance: none;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  user-select: none;
+  position: relative;
+  white-space: nowrap;
+  vertical-align: middle;
+  outline: transparent solid 2px;
+  outline-offset: 2px;
+  line-height: 1.2;
+  border-radius: 0.375rem;
+  border-width: 0;
+  font-weight: 500;
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-duration: 0.2s;
+  height: 2.25rem;
+  min-width: 2.25rem;
+  font-size: 0.875rem;
+  padding-inline-start: 0.75rem;
+  padding-inline-end: 0.75rem;
+  background: #e53e3e;
+  color: #fff;
+
+  &:hover {
+    background: #c53030;
+  }
+
+  &:active {
+    background: #9b2c2c;
+  }
+
+  &:disabled {
+    background: #e53e3e;
+  }
+}
+
 .btn-outline {
   display: inline-flex;
   appearance: none;

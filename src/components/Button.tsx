@@ -3,7 +3,7 @@ import cls from './Button.module.scss'
 
 interface ButtonProps {
   children: React.ReactNode
-  variant?: 'solid' | 'outline'
+  variant?: 'solid' | 'solid-red' | 'outline'
   type?: 'button' | 'submit' | 'reset'
   isDisabled?: boolean
   onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
@@ -15,7 +15,7 @@ const Button = ({ children, type = 'button', variant = 'solid', isDisabled = fal
     console.error('Button component requires children')
   }
 
-  const vari = variant === 'solid' ? cls.btnSolid : cls.btnOutline
+  const vari = variant === 'solid' ? cls.btnSolid : variant === 'solid-red' ? cls.btnSolidRed : cls.btnOutline
 
   return (
     <button type={type} className={vari} disabled={isDisabled} onClick={onClick} style={style}>
