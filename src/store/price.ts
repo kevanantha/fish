@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 
+import { generateTglParsedTimestamp, generateUUID } from '../utils'
+
 interface PriceFormData {
   uuid: string
   komoditas: string
@@ -29,7 +31,7 @@ interface Actions {
 }
 
 const initialState: PriceFormData = {
-  uuid: '',
+  uuid: generateUUID(),
   komoditas: '',
   area_provinsi: '',
   area_kota: '',
@@ -41,7 +43,10 @@ const initialState: PriceFormData = {
 
 export const usePriceStore = create<State & Actions>((set) => ({
   formData: initialState,
-  setFormData: (data: PriceFormData) => set((state) => ({ formData: { ...state.formData, ...data } })),
+  setFormData: (data: PriceFormData) => set((state) => {
+    const [tgl_parsed, timestamp] = generateTglParsedTimestamp()
+    return { formData: { ...state.formData, ...data, tgl_parsed, timestamp } }
+  }),
   resetFormData: () => set(() => ({ formData: initialState })),
   isLoadingSubmit: false,
   setIsLoadingSubmit: (isLoading: boolean) => set(() => ({ isLoadingSubmit: isLoading })),

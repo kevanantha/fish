@@ -4,7 +4,6 @@ import { UseQueryResult } from '@tanstack/react-query'
 import Button from './Button'
 
 import cls from './Form.module.scss'
-import { generateTglParsedTimestamp, generateUUID } from '../utils'
 import { usePriceStore } from '../store/price'
 
 interface PriceState {
@@ -47,10 +46,6 @@ const Form = ({ onFormSubmit, queryOptionsSize, queryOptionsProvince, queryOptio
 
     isEdit ? setIsLoadingUpdate(true) : setIsLoadingSubmit(true)
 
-    const [tgl_parsed, timestamp] = generateTglParsedTimestamp()
-    const uuid = generateUUID()
-
-    setFormData({ ...formData, uuid, tgl_parsed, timestamp })
     onFormSubmit(formData)
   }
 
@@ -135,30 +130,26 @@ const Form = ({ onFormSubmit, queryOptionsSize, queryOptionsProvince, queryOptio
         </select>
       </div>
 
-      {queryOptionsCity.isPaused ? (
-        <div>fetching options city</div>
-      ) : (
-        <div className={cls.formGroup}>
-          <label htmlFor='area-field'>Area</label>
-          <select
-            id='area-field'
-            name='area_kota'
-            className={cls.formControl}
-            value={formData.area_kota}
-            disabled={!formData.area_provinsi || queryOptionsCity.isFetching}
-            onChange={handleChange}
-          >
-            <option value='' disabled={queryOptionsCity.isFetching}>
-              {queryOptionsCity.isFetching ? 'Fetching options city...' : 'Select an option'}
+      <div className={cls.formGroup}>
+        <label htmlFor='area-field'>Area</label>
+        <select
+          id='area-field'
+          name='area_kota'
+          className={cls.formControl}
+          value={formData.area_kota}
+          disabled={!formData.area_provinsi || queryOptionsCity.isFetching}
+          onChange={handleChange}
+        >
+          <option value='' disabled={queryOptionsCity.isFetching}>
+            {queryOptionsCity.isFetching ? 'Fetching options city...' : 'Select an option'}
+          </option>
+          {queryOptionsCity.data?.map(({ city }, index) => (
+            <option key={index} value={city}>
+              {city}
             </option>
-            {queryOptionsCity.data?.map(({ city }, index) => (
-              <option key={index} value={city}>
-                {city}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+          ))}
+        </select>
+      </div>
 
       <div style={{ display: 'flex', justifyContent: 'end', gap: '8px' }}>
         {isEdit ? (

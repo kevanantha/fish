@@ -5,6 +5,8 @@ import axios from 'axios'
 import { usePriceStore } from '../store/price'
 import { usePaginationStore } from '../store/pagination'
 
+import { generateTglParsedTimestamp, generateUUID } from '../utils'
+
 import { useDebounce } from '../hooks/useDebounce'
 
 import Button from '../components/Button'
@@ -89,7 +91,6 @@ const Price = () => {
   const addPriceMutation = useMutation({
     mutationFn: async (price: PricePayload[]) => {
       price[0].komoditas = price[0].komoditas.toUpperCase()
-      console.log(price)
       return await axios.post('https://stein.efishery.com/v1/storages/5e1edf521073e315924ceab4/list', price)
     },
     onSettled: () => {
@@ -167,7 +168,7 @@ const Price = () => {
 
       return filteredNull
         .sort((a: PriceList, b: PriceList) => {
-          return +a.timestamp - +b.timestamp
+          return +b.timestamp - +a.timestamp
         })
         .slice(firstIndex, lastIndex)
     },
@@ -274,8 +275,8 @@ const Price = () => {
   }
 
   const handleUpdate = (price: PricePayload) => () => {
-    setIsEdit(true)
     setFormData(price)
+    setIsEdit(true)
     setIsModalOpen(true)
   }
 
